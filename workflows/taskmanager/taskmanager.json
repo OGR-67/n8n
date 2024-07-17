@@ -1,0 +1,361 @@
+{
+  "name": "n8n demo",
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "5007d7d4-b85a-4845-8cd4-560ad253b782",
+              "leftValue": "={{ $json.Subject }}",
+              "rightValue": "task: ",
+              "operator": {
+                "type": "string",
+                "operation": "startsWith"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "d07eb52e-506e-4b4d-971e-817dad8b35b1",
+      "name": "Filter tasks",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2,
+      "position": [
+        620,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "formatDate",
+        "date": "={{ DateTime.fromMillis(parseInt($json.internalDate)) }}",
+        "format": "yyyy/MM/dd",
+        "options": {
+          "includeInputFields": true
+        }
+      },
+      "id": "54cde16a-5e61-497f-9b43-28419dcb165b",
+      "name": "format received date",
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        800,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b610e28c-09e5-4eac-84e7-c3dcd80d6196",
+              "name": "name",
+              "value": "={{ $json.Subject.substring(5).trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "306e6264-2874-42c3-9611-6f8910cc6b40",
+              "name": "date",
+              "value": "={{ $json.formattedDate }}",
+              "type": "string"
+            },
+            {
+              "id": "c8ac8f89-4b75-4991-a7c6-447a86a5d980",
+              "name": "content",
+              "value": "={{ $json.snippet }}",
+              "type": "string"
+            },
+            {
+              "id": "caa5848d-7c08-4bcb-8f60-1e35b49072cc",
+              "name": "requestor",
+              "value": "={{ $json.From }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "83d3aa13-5eee-4eee-a554-175bf09de81f",
+      "name": "Extract infos",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        980,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appc8ZJEDp79vzAAX",
+          "mode": "list",
+          "cachedResultName": "demo",
+          "cachedResultUrl": "https://airtable.com/appc8ZJEDp79vzAAX"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblsHQO5pmk5xx6MH",
+          "mode": "list",
+          "cachedResultName": "tasks",
+          "cachedResultUrl": "https://airtable.com/appc8ZJEDp79vzAAX/tblsHQO5pmk5xx6MH"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "requestor",
+              "displayName": "requestor",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "content",
+              "displayName": "content",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7efcc206-ec7a-42db-a289-645ca7c2c9d4",
+      "name": "Airtable",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1160,
+        260
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "OFysuB9HOps1jkIZ",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "field": "fields.name"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e14f7b94-b0c0-4818-8020-3c73066405cb",
+      "name": "Summarize",
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1,
+      "position": [
+        1320,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C07CG7DDC5Q",
+          "mode": "id"
+        },
+        "text": "={{ $json.count_fields_name }} task{{ $json.count_fields_name > 1 ? \"s\" : \"\" }} has been added",
+        "otherOptions": {}
+      },
+      "id": "c1ce1755-b21f-4709-836a-0c8f987a159d",
+      "name": "Slack",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [
+        1480,
+        260
+      ],
+      "credentials": {
+        "slackApi": {
+          "id": "oxnsytfrAqxOKgpB",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "markAsRead",
+        "messageId": "={{ $json.id }}"
+      },
+      "id": "4f9c330a-da68-46a6-8ea7-4c14e37d852a",
+      "name": "Gmail",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        800,
+        460
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "iVz1UJYk8EEIpGFJ",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyHour"
+            }
+          ]
+        },
+        "filters": {}
+      },
+      "id": "14f58521-f536-4f35-87ea-9b76c51820f9",
+      "name": "Gmail Trigger",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        420,
+        260
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "iVz1UJYk8EEIpGFJ",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Filter tasks": {
+      "main": [
+        [
+          {
+            "node": "format received date",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "format received date": {
+      "main": [
+        [
+          {
+            "node": "Extract infos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract infos": {
+      "main": [
+        [
+          {
+            "node": "Airtable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable": {
+      "main": [
+        [
+          {
+            "node": "Summarize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarize": {
+      "main": [
+        [
+          {
+            "node": "Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Filter tasks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "qiCGCLFbTQLsRhT5"
+  },
+  "versionId": "a0d556aa-2ae9-4628-be05-d7bbc2f0683b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9aa076f4269e9526a2122b7191ec74c03d9fd475a9024f900e6df679a8c14e4a"
+  },
+  "id": "0O0XugGX9g3BrYNN",
+  "tags": []
+}

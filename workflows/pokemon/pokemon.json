@@ -1,0 +1,554 @@
+{
+  "name": "n8n demo ia",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "82612b3e-edf5-45d7-b112-9cbd4125a0c6",
+        "formTitle": "Tournois de Pokémon",
+        "formDescription": "Entrez votre pseudo pour recevoir automatiquement une équipe de Pokémon. Si vous ne fournissez pas de nom d'équipe, un nom sera généré pour vous.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Pseudo",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Nom de l'équipe (optionnel)"
+            }
+          ]
+        },
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "096f7d0d-e9bc-4cf3-957c-97d6a4fc0cb2",
+      "name": "n8n Form Trigger",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2,
+      "position": [
+        -460,
+        240
+      ],
+      "webhookId": "82612b3e-edf5-45d7-b112-9cbd4125a0c6"
+    },
+    {
+      "parameters": {
+        "url": "https://pokebuildapi.fr/api/v1/random/team/suggest",
+        "options": {}
+      },
+      "id": "f12a0cb4-daac-4327-ad2e-6a4385774517",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -260,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return JSON.parse($('OpenAI').first().json.message.content)"
+      },
+      "id": "75ad0353-6c53-45e2-b6eb-04c8e4a70b81",
+      "name": "parse JSON",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        300,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appyJvSItDFg3E8Pr",
+          "mode": "list",
+          "cachedResultName": "Tournois Pokémon",
+          "cachedResultUrl": "https://airtable.com/appyJvSItDFg3E8Pr"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblgI4frWLJFE4ltm",
+          "mode": "list",
+          "cachedResultName": "team",
+          "cachedResultUrl": "https://airtable.com/appyJvSItDFg3E8Pr/tblgI4frWLJFE4ltm"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "name": "={{ $json.name || $('n8n Form Trigger').item.json.Pseudo }}",
+            "strengths": "={{ $json.strengths }}",
+            "weaknesses": "={{ $json.weaknesses }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "player",
+              "displayName": "player",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "pokemons",
+              "displayName": "pokemons",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "strengths",
+              "displayName": "strengths",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "weaknesses",
+              "displayName": "weaknesses",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b90744cd-5a47-4039-bb10-0717cbd66df0",
+      "name": "create team",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        560,
+        240
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "OFysuB9HOps1jkIZ",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appyJvSItDFg3E8Pr",
+          "mode": "list",
+          "cachedResultName": "Tournois Pokémon",
+          "cachedResultUrl": "https://airtable.com/appyJvSItDFg3E8Pr"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl4iUYEoWVP4dXRm",
+          "mode": "list",
+          "cachedResultName": "players",
+          "cachedResultUrl": "https://airtable.com/appyJvSItDFg3E8Pr/tbl4iUYEoWVP4dXRm"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "nickname": "={{ $('n8n Form Trigger').item.json.Pseudo }}",
+            "team": "={{ [$json.id] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "nickname",
+              "displayName": "nickname",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "createdAt",
+              "displayName": "createdAt",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "team",
+              "displayName": "team",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "18463dc0-f4d3-4e1e-9c63-585e77343f5d",
+      "name": "create player",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        780,
+        240
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "OFysuB9HOps1jkIZ",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const teamId = $('create team').first().json.id;\nconst pokemons = $('HTTP Request').first().json;\n\nreturn pokemons.map(pokemon => {\n  return {\n    json: {\n      teamId: teamId,\n      ...pokemon\n    }\n  };\n});"
+      },
+      "id": "4b22a494-1171-4706-82c1-70d9e12e8760",
+      "name": "split pokemon and append teamId",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1000,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.html }}",
+        "options": {}
+      },
+      "id": "fd0f6be1-44df-4525-b1dc-30305200a0d0",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        740,
+        640
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appyJvSItDFg3E8Pr",
+          "mode": "list",
+          "cachedResultName": "Tournois Pokémon",
+          "cachedResultUrl": "https://airtable.com/appyJvSItDFg3E8Pr"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblEBaMZtTSateaOG",
+          "mode": "list",
+          "cachedResultName": "pokemons",
+          "cachedResultUrl": "https://airtable.com/appyJvSItDFg3E8Pr/tblEBaMZtTSateaOG"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "name": "={{ $json.name }}",
+            "team": "={{ [$json.teamId] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "team",
+              "displayName": "team",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5feb4380-a9ca-4ab3-9033-d3afa2c72cdd",
+      "name": "create pokemons",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1220,
+        240
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "OFysuB9HOps1jkIZ",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const teamName = $('parse JSON').first().json.name;\nconst strengths = $('parse JSON').first().json.strengths;\nconst weaknesses = $('parse JSON').first().json.weaknesses;\nconst pokemons = $('split pokemon and append teamId').all().map(item => item.json);\nconst pokemonsImgTags = pokemons\n  .map(pokemon => `<img width=\"60px\" src=\"${pokemon.image}\" alt=\"${pokemon.name}\" />`)\n  .join(\"\");\n\nreturn {\n  html: `<!DOCTYPE html>\n<html lang=\"fr\">\n\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>Réponse du formulaire</title>\n</head>\n\n<body style=\"padding: 10px;\">\n  <h1 style=\"margin: 10px\">${teamName} participe au tournois!</h1>\n  <div style=\"margin: 10px; display: flex; flex-wrap: wrap; justify-content: space-around;\">\n${pokemonsImgTags}\n</div>\n  <div style=\"display: flex; flex-wrap: wrap; justify-content: space-around; gap: 20px\">\n    <div style=\"min-width: 200px; max-width: 400px;\">\n      <h3>Forces :</h3>\n      <p>${strengths}</p>\n    </div>\n    <div style=\"min-width: 200px; max-width: 400px;\">\n      <h3>Faiblesses :</h3>\n      <p>${weaknesses}</p>\n    </div>\n  </div>\n</body>\n\n</html>`\n}"
+      },
+      "id": "baa66e9f-98f2-440c-af92-303d13161387",
+      "name": "create HTML",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        640
+      ]
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4",
+          "mode": "list",
+          "cachedResultName": "GPT-4"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Voici une liste de pokémon.\n\n{{ JSON.stringify($json) }}\n\nA partir de cette liste, je veux que tu me génères:\n- un nom d'équipe\n- les forces de l'équipe\n- les faiblesses de l'équipe\n\nPrésente moi les résultats en json en suivant le schémas suivant:\n{\nname: text,\nstrengths: text,\nweaknesses: text\n}\n\nPrésente uniquement le json que je puisse traiter ta réponse directement."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a6fad728-86a6-434e-8db4-7fdeae19834b",
+      "name": "OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.4,
+      "position": [
+        -60,
+        240
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "3FEUz4lwNqpLObnX",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C07DC7K0VQ8",
+          "mode": "id"
+        },
+        "text": "=L'équipe \"{{ $json.name }}\" participe au tournois! ",
+        "otherOptions": {}
+      },
+      "id": "9c8b0385-a93c-46e8-932a-0308691df9b4",
+      "name": "Slack",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [
+        720,
+        460
+      ],
+      "credentials": {
+        "slackApi": {
+          "id": "oxnsytfrAqxOKgpB",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "chooseBranch",
+        "useDataOfInput": 2
+      },
+      "id": "4af52ddf-d0c9-4007-bd40-41af30234b8a",
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        560,
+        460
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "n8n Form Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "parse JSON": {
+      "main": [
+        [
+          {
+            "node": "create team",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "create HTML",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "create team": {
+      "main": [
+        [
+          {
+            "node": "create player",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "create player": {
+      "main": [
+        [
+          {
+            "node": "split pokemon and append teamId",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "split pokemon and append teamId": {
+      "main": [
+        [
+          {
+            "node": "create pokemons",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "create pokemons": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "create HTML": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "parse JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "ukuHCpnM9BcT0JsF"
+  },
+  "versionId": "a87abfef-2a89-41e9-9370-51a225766cfa",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9aa076f4269e9526a2122b7191ec74c03d9fd475a9024f900e6df679a8c14e4a"
+  },
+  "id": "qHMAoZkG01FZmDkS",
+  "tags": []
+}
