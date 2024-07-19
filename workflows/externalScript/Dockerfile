@@ -1,5 +1,9 @@
 FROM n8nio/n8n
 
-RUN npm install fs-extra
+WORKDIR /home/project
 
-CMD ["n8n"]
+COPY . .
+
+RUN npm install
+
+CMD ["start"]
