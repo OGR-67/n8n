@@ -1,0 +1,54 @@
+{
+  "name": "Execute command",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "8eaf519f-80b9-47cb-9289-5d5b0f097945",
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        500,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "command": "node /home/project/script.js"
+      },
+      "id": "0544493a-052e-422f-b886-ae671b993073",
+      "name": "Execute Command",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        720,
+        240
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Execute Command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "70a0126c-7deb-47d7-919e-ad6bc1814478",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9aa076f4269e9526a2122b7191ec74c03d9fd475a9024f900e6df679a8c14e4a"
+  },
+  "id": "ue4xoUPsXwRa7pk8",
+  "tags": []
+}
