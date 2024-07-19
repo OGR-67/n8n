@@ -1,0 +1,222 @@
+{
+  "name": "scrapping",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "56e9e7b9-1f03-4343-ae3c-2ebbba46f431",
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        200,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "command": "node /home/project/script.js\n"
+      },
+      "id": "68e333e9-1d24-4c5e-8bec-ed60fc74f9f9",
+      "name": "Execute Command",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        420,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return JSON.parse($('Execute Command').first().json.stdout)"
+      },
+      "id": "727101e9-72bd-4b34-9747-18885538c29b",
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        640,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "CREATE TABLE IF NOT EXISTS scraped_data (\n  id SERIAL PRIMARY KEY,\n  title TEXT,\n  link TEXT\n);\n\nINSERT INTO scraped_data (title, link) VALUES ($1, $2);\n",
+        "options": {
+          "queryReplacement": "={{ $json.title }},  {{ $json.link }}"
+        }
+      },
+      "id": "2ba547b4-4b8f-4ec4-844c-fe0b234dd27b",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.4,
+      "position": [
+        840,
+        220
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "TQT28MsAQCxXEi2d",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "b46713b3-a6b4-4703-9f7a-ce94cb0a4161",
+              "leftValue": "={{ $json.success }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a92c5442-cbba-4143-97e8-1940d8e9f102",
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1060,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "schema": {
+          "__rl": true,
+          "value": "public",
+          "mode": "list",
+          "cachedResultName": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "scraped_data",
+          "mode": "list",
+          "cachedResultName": "scraped_data"
+        },
+        "returnAll": true,
+        "options": {}
+      },
+      "id": "df516c8d-c97e-45cb-8793-9abc9cfc2611",
+      "name": "Postgres1",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.4,
+      "position": [
+        1260,
+        140
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "TQT28MsAQCxXEi2d",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "errorMessage": "Unable to save records"
+      },
+      "id": "2d65d861-bb71-4742-9929-49fb9e258e83",
+      "name": "Stop and Error",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1260,
+        340
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Execute Command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Postgres1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "qiCGCLFbTQLsRhT5"
+  },
+  "versionId": "d73c107c-5744-4032-929c-dcc86726f0c5",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9aa076f4269e9526a2122b7191ec74c03d9fd475a9024f900e6df679a8c14e4a"
+  },
+  "id": "BFqSPBlYyNN9BCb1",
+  "tags": []
+}
